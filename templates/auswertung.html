@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <title>Auswertung</title>
+</head>
+<body>
+  <h1>Auswertung der Tipps</h1>
+
+  <table border="1">
+    <tr>
+      <th>Tipper</th>
+      <th>Etappe</th>
+      <th>Punkte</th>
+    </tr>
+    {% for bewertung in bewertungen %}
+      <tr>
+        <td>{{ bewertung.tipper }}</td>
+        <td>{{ bewertung.etappe }}</td>
+        <td>{{ bewertung.punkte }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <p><a href="{{ url_for('index') }}">Zurück zur Übersicht</a></p>
+</body>
+</html>

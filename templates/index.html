@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Tour de France Tippspiel 2025</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    table {
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 6px 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+    .punkte {
+      font-weight: bold;
+      color: green;
+    }
+    .korrekt-3 { color: darkgreen; font-weight: bold; }
+    .korrekt-2 { color: orange; }
+    .korrekt-1 { color: red; }
+    .korrekt-0 { color: #aaa; }
+  </style>
+</head>
+<body>
+  <h1>🏁 Tour de France Tippspiel 2025</h1>
+    <p><a href="{{ url_for('tippen') }}">Tipp abgeben</a></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Platz</th>
+        <th>Tipper</th>
+        <th>Gesamtpunkte</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for name, daten in rangliste %}
+        <tr>
+          <td>{{ loop.index }}.</td>
+          <td>{{ name }}</td>
+          <td class="punkte">{{ daten.gesamtpunkte }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% for name, daten in rangliste %}
+    <h2>{{ name }}</h2>
+    {% for tipp in daten.tipps %}
+      <h3>Etappe: {{ tipp.etappe }}</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Kategorie</th>
+            <th>Dein Tipp</th>
+            <th>Punkte</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for kategorie in kategorien %}
+            {% if tipp.daten[kategorie] %}
+              <tr>
+                <td>{{ kategorie.replace('_', ' ').capitalize() }}</td>
+                <td>{{ tipp.daten[kategorie] }}</td>
+               {% set pkt = tipp.korrekt.get(kategorie, 0) %}
+                <td class="korrekt-{{ pkt }}">{{ pkt }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  {% endfor %}
+
+</body>
+</html>

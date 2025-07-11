@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Tour de France Tippspiel – Tipp abgeben</title>
+  <p><a href="{{ url_for('index') }}">Zurück zur Übersicht</a></p>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    label {
+      display: inline-block;
+      width: 220px;
+      margin-bottom: 5px;
+    }
+    select {
+      width: 300px;
+    }
+    .nur-bei-gesamtsieger,
+    .nur-bei-etappe {
+      display: none;
+    }
+    .hinweis {
+      margin-bottom: 20px;
+      color: #444;
+      font-style: italic;
+    }
+  </style>
+  <script>
+    function reloadForm() {
+      const tipper = document.querySelector('select[name="tipper"]').value;
+      const etappe = document.querySelector('select[name="etappe"]').value;
+      if (tipper && etappe) {
+        window.location.href = `/tippen?tipper=${encodeURIComponent(tipper)}&etappe=${encodeURIComponent(etappe)}`;
+      }
+    }
+
+    function toggleFelder() {
+      const etappe = document.querySelector('select[name="etappe"]').value.trim().toLowerCase();
+      const istGesamtsieger = etappe === 'gesamtsieger';
+
+      document.querySelectorAll('.nur-bei-gesamtsieger').forEach(el => {
+        el.style.display = istGesamtsieger ? 'block' : 'none';
+      });
+      document.querySelectorAll('.nur-bei-etappe').forEach(el => {
+        el.style.display = istGesamtsieger ? 'none' : 'block';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', toggleFelder);
+  </script>
+</head>
+<body>
+  <h1>🚴 Tipp abgeben</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul>
+        {% for category, message in messages %}
+          <li><strong>{{ category.capitalize() }}:</strong> {{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="post">
+    <label for="tipper">Tipper:</label>
+    <select name="tipper" required onchange="reloadForm()">
+      <option value="">--</option>
+      {% for t in tipper %}
+        <option value="{{ t }}" {% if t == request.args.get('tipper') %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="etappe">Etappe:</label>
+    <select name="etappe" required onchange="reloadForm(); toggleFelder()">
+      <option value="">--</option>
+      {% for e in etappen %}
+        <option value="{{ e }}" {% if e == request.args.get('etappe') %}selected{% endif %}>{{ e }}</option>
+      {% endfor %}
+    </select>
+    <br><br>
+
+    <div class="hinweis">Felder leer lassen, wenn kein Tipp abgegeben wird.</div>
+
+    {% for kategorie in kategorien %}
+      {% set ist_gesamt = kategorie.startswith('gesamtsieger') %}
+      <div class="{% if ist_gesamt %}nur-bei-gesamtsieger{% else %}nur-bei-etappe{% endif %}">
+        <label for="{{ kategorie }}">
+          {{ kategorie_labels[kategorie] if kategorie in kategorie_labels else kategorie.replace('_', ' ').capitalize() }}:
+        </label>
+
+        {% if 'team' in kategorie %}
+          <select name="{{ kategorie }}" id="{{ kategorie }}">
+            <option value="">--</option>
+            {% for team in teams %}
+              <option value="{{ team }}" {% if vorbefuellung.get(kategorie) == team %}selected{% endif %}>{{ team }}</option>
+            {% endfor %}
+          </select>
+        {% else %}
+          <select name="{{ kategorie }}" id="{{ kategorie }}">
+            <option value="">--</option>
+            {% for fahrer in fahrer_liste %}
+              <option value="{{ fahrer }}" {% if vorbefuellung.get(kategorie) == fahrer %}selected{% endif %}>{{ fahrer }}</option>
+            {% endfor %}
+          </select>
+        {% endif %}
+        <br><br>
+      </div>
+    {% endfor %}
+
+    <button type="submit">Tipp speichern</button>
+ 
+ 
+    {% if request.args.get('tipper') == 'Admin' %}
+  <label for="admin_code">Admin-Code:</label>
+  <input type="password" name="admin_code" required>
+  <br><br>
+{% endif %}
+    
+    
+    
+  </form>
+
+</body>
+</html>
