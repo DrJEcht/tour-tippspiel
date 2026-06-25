@@ -1,6 +1,8 @@
 import os
 from flask import Flask, request, render_template, redirect, url_for, flash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "lokaler_test_schluessel")
@@ -72,6 +74,13 @@ class EtappenStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     etappe = db.Column(db.String(200), unique=True, nullable=False)
     gesperrt = db.Column(db.Boolean, default=False)
+
+class Benutzer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    passwort_hash = db.Column(db.String(255), nullable=False)
+    ist_admin = db.Column(db.Boolean, default=False)
+    aktiv = db.Column(db.Boolean, default=True)
 
 with app.app_context():
     db.create_all()
