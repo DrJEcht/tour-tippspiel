@@ -1,4 +1,3 @@
-import json
 import os
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -17,7 +16,7 @@ db = SQLAlchemy(app)
 
 DATA_DIR = "data"
 
-TIPPER = ["Steffi", "MieseGriese", "vdH", "Günni", "Chapui", "Admin", "Mike"]
+TIPPER = ["Steffi", "MieseGriese", "vdH", "Günni", "Chapui", "Admin"]
 
 BASIS_KATEGORIEN = [
     "etappe_gewinner_fahrer",
@@ -43,6 +42,20 @@ def get_admin_kategorien():
 
 
 ALL_KATEGORIEN = get_admin_kategorien()
+
+
+KATEGORIE_LABELS = {
+    "etappe_gewinner_fahrer": "Etappensieger",
+    "etappe_gewinner_team": "Team",
+    "gelbes_trikot": "Gelb",
+    "gruenes_trikot": "Grün",
+    "gepunktetes_trikot": "Berg",
+    "weisses_trikot": "Weiß",
+    "gesamtsieger_tour": "Gesamt Gelb",
+    "gesamtsieger_gruen": "Gesamt Grün",
+    "gesamtsieger_gepunktet": "Gesamt Berg",
+    "gesamtsieger_weiss": "Gesamt Weiß",
+}
 
 
 class Tipp(db.Model):
@@ -82,20 +95,19 @@ def load_tipps():
 
 
 def save_tipp(tipp):
-    bestehender_tipp = Tipp.query.filter_by(
+    vorhandener_tipp = Tipp.query.filter_by(
         tipper=tipp.get("tipper"),
         etappe=tipp.get("etappe")
     ).first()
 
-    if bestehender_tipp:
-        bestehender_tipp.daten = tipp
+    if vorhandener_tipp:
+        vorhandener_tipp.daten = tipp
     else:
-        neuer_tipp = Tipp(
+        db.session.add(Tipp(
             tipper=tipp.get("tipper"),
             etappe=tipp.get("etappe"),
             daten=tipp
-        )
-        db.session.add(neuer_tipp)
+        ))
 
     db.session.commit()
 
@@ -103,40 +115,38 @@ def save_tipp(tipp):
 def berechne_rangliste():
     tipps = load_tipps()
     rangliste = {}
-    referenz = None
+    referenzen = {}
 
     for tipp in tipps:
         if tipp.get("tipper") == "Admin":
-            referenz = tipp
-            break
-
-    if not referenz:
-        return rangliste
+            referenzen[tipp.get("etappe")] = tipp
 
     for tipp in tipps:
         name = tipp.get("tipper")
+        etappe = tipp.get("etappe")
+
         if name == "Admin":
             continue
 
+        if etappe not in referenzen:
+            continue
+
+        referenz = referenzen[etappe]
         korrekt = {}
         punkte = 0
 
         for feld in BASIS_KATEGORIEN:
             tipp_wert = tipp.get(feld, "").strip()
-            if not tipp_wert:
-                korrekt[feld] = 0
-                continue
-
             platz1 = referenz.get(feld, "").strip()
             platz2 = referenz.get(feld + "_platz2", "").strip()
             platz3 = referenz.get(feld + "_platz3", "").strip()
 
             punktzahl = 0
-            if tipp_wert == platz1 and platz1 != "":
+            if tipp_wert and tipp_wert == platz1:
                 punktzahl = 3
-            elif tipp_wert == platz2 and platz2 != "":
+            elif tipp_wert and tipp_wert == platz2:
                 punktzahl = 2
-            elif tipp_wert == platz3 and platz3 != "":
+            elif tipp_wert and tipp_wert == platz3:
                 punktzahl = 1
 
             korrekt[feld] = punktzahl
@@ -150,26 +160,13 @@ def berechne_rangliste():
 
         rangliste[name]["gesamtpunkte"] += punkte
         rangliste[name]["tipps"].append({
-            "etappe": tipp.get("etappe"),
+            "etappe": etappe,
             "daten": tipp,
-            "korrekt": korrekt
+            "korrekt": korrekt,
+            "punkte": punkte
         })
 
     return rangliste
-
-
-KATEGORIE_LABELS = {
-    "etappe_gewinner_fahrer": "Etappensieger (Fahrer)",
-    "etappe_gewinner_team": "Etappensieger (Team)",
-    "gelbes_trikot": "Gelbes Trikot",
-    "gruenes_trikot": "Grünes Trikot",
-    "gepunktetes_trikot": "Gepunktetes Trikot",
-    "weisses_trikot": "Weißes Trikot",
-    "gesamtsieger_tour": "Gesamtsieger – Gelb",
-    "gesamtsieger_gruen": "Gesamtsieger – Grün",
-    "gesamtsieger_gepunktet": "Gesamtsieger – Gepunktet",
-    "gesamtsieger_weiss": "Gesamtsieger – Weiß",
-}
 
 
 @app.route("/")
@@ -181,23 +178,19 @@ def index():
         reverse=True
     )
 
-    ausgewaehlte_etappe = request.args.get("etappe")
     etappen = load_etappen()
-
-    if not ausgewaehlte_etappe and etappen:
-        ausgewaehlte_etappe = etappen[0]
+    ausgewaehlte_etappe = request.args.get("etappe") or (etappen[0] if etappen else None)
 
     tipps_etappe = []
 
     for name, daten in rangliste:
         for tipp in daten["tipps"]:
             if tipp["etappe"] == ausgewaehlte_etappe:
-                punkte_summe = sum(tipp["korrekt"].values())
                 tipps_etappe.append({
                     "name": name,
                     "daten": tipp["daten"],
                     "korrekt": tipp["korrekt"],
-                    "punkte": punkte_summe
+                    "punkte": tipp["punkte"]
                 })
 
     return render_template(
@@ -218,7 +211,7 @@ def tippen():
 
         if tipp.get("tipper") == "Admin":
             admin_code = tipp.get("admin_code", "")
-            if admin_code != "Ulle":
+            if admin_code != os.environ.get("ADMIN_CODE", "Ulle"):
                 flash("Falscher Admin-Code!", "error")
                 return redirect(url_for("tippen", tipper="Admin"))
 
@@ -227,8 +220,7 @@ def tippen():
             return redirect(url_for("tippen"))
 
         save_tipp(tipp)
-
-        flash("Tipp erfolgreich abgegeben!", "success")
+        flash("Tipp erfolgreich gespeichert!", "success")
         return redirect(url_for("index"))
 
     tipp_auswahl_tipper = request.args.get("tipper")
