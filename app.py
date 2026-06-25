@@ -180,10 +180,34 @@ def index():
         key=lambda x: x[1]["gesamtpunkte"],
         reverse=True
     )
+
+    ausgewaehlte_etappe = request.args.get("etappe")
+    etappen = load_etappen()
+
+    if not ausgewaehlte_etappe and etappen:
+        ausgewaehlte_etappe = etappen[0]
+
+    tipps_etappe = []
+
+    for name, daten in rangliste:
+        for tipp in daten["tipps"]:
+            if tipp["etappe"] == ausgewaehlte_etappe:
+                punkte_summe = sum(tipp["korrekt"].values())
+                tipps_etappe.append({
+                    "name": name,
+                    "daten": tipp["daten"],
+                    "korrekt": tipp["korrekt"],
+                    "punkte": punkte_summe
+                })
+
     return render_template(
         "index.html",
         rangliste=rangliste,
-        kategorien=BASIS_KATEGORIEN
+        kategorien=BASIS_KATEGORIEN,
+        etappen=etappen,
+        ausgewaehlte_etappe=ausgewaehlte_etappe,
+        tipps_etappe=tipps_etappe,
+        kategorie_labels=KATEGORIE_LABELS
     )
 
 
