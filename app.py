@@ -300,6 +300,41 @@ def admin():
         etappe = request.form.get("etappe")
         aktion = request.form.get("aktion")
 
+        
+        if request.method == "POST":
+            etappe = request.form.get("etappe")
+            aktion = request.form.get("aktion")
+        
+            if aktion == "benutzer_anlegen":
+                name = request.form.get("name", "").strip()
+                passwort = request.form.get("passwort", "").strip()
+                ist_admin = request.form.get("ist_admin") == "on"
+        
+                if not name or not passwort:
+                    flash("Name und Passwort sind erforderlich.", "error")
+        
+                elif Benutzer.query.filter_by(name=name).first():
+                    flash("Benutzer existiert bereits.", "error")
+        
+                else:
+                    benutzer = Benutzer(
+                        name=name,
+                        passwort_hash=generate_password_hash(passwort),
+                        ist_admin=ist_admin
+                    )
+                    db.session.add(benutzer)
+                    db.session.commit()
+                    flash(f"Benutzer {name} wurde angelegt.", "success")
+        
+            elif etappe and aktion == "sperren":
+                setze_etappe_gesperrt(etappe, True)
+                flash(f"{etappe} wurde gesperrt.", "success")
+        
+            elif etappe and aktion == "entsperren":
+                setze_etappe_gesperrt(etappe, False)
+                flash(f"{etappe} wurde wieder geöffnet.", "success")
+       
+
         if etappe and aktion == "sperren":
             setze_etappe_gesperrt(etappe, True)
             flash(f"{etappe} wurde gesperrt.", "success")
@@ -320,6 +355,7 @@ def admin():
         eingeloggt=True,
         admin_code=admin_code,
         etappen_status=etappen_status
+        benutzer=Benutzer.query.order_by(Benutzer.name).all()
     )
 
 if __name__ == "__main__":
