@@ -261,16 +261,20 @@ def tippen():
         if vorhandener_tipp:
             vorbefuellung = vorhandener_tipp.daten
 
-    return render_template(
-        "tippen.html",
-        tipper=TIPPER,
-        kategorien=kategorien,
-        fahrer_liste=load_fahrer(),
-        teams=load_teams(),
-        etappen=load_etappen(),
-        vorbefuellung=vorbefuellung,
-        kategorie_labels=KATEGORIE_LABELS
-    )
+        return render_template(
+            "tippen.html",
+            tipper=TIPPER,
+            kategorien=kategorien,
+            fahrer_liste=load_fahrer(),
+            teams=load_teams(),
+            etappen=load_etappen(),
+            gesperrte_etappen=[
+                e for e in load_etappen()
+                if ist_etappe_gesperrt(e)
+            ],
+            vorbefuellung=vorbefuellung,
+            kategorie_labels=KATEGORIE_LABELS
+        )
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
