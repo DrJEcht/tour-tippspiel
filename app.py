@@ -227,9 +227,11 @@ def index():
 def tippen():
     if request.method == "POST":
         tipp = request.form.to_dict()
-if tipp.get("tipper") != "Admin" and ist_etappe_gesperrt(tipp.get("etappe")):
-    flash("Diese Tipprunde ist bereits gesperrt.", "error")
-    return redirect(url_for("tippen"))
+
+        if tipp.get("tipper") != "Admin" and ist_etappe_gesperrt(tipp.get("etappe")):
+            flash("Diese Tipprunde ist bereits gesperrt.", "error")
+            return redirect(url_for("tippen"))
+
         if tipp.get("tipper") == "Admin":
             admin_code = tipp.get("admin_code", "")
             if admin_code != os.environ.get("ADMIN_CODE", "Ulle"):
