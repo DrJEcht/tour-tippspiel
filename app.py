@@ -102,10 +102,7 @@ def setze_etappe_gesperrt(etappe, gesperrt):
     status = EtappenStatus.query.filter_by(etappe=etappe).first()
 
     if not status:
-        status = EtappenStatus(
-            etappe=etappe,
-            gesperrt=gesperrt
-        )
+        status = EtappenStatus(etappe=etappe, gesperrt=gesperrt)
         db.session.add(status)
     else:
         status.gesperrt = gesperrt
@@ -230,10 +227,7 @@ def index():
 def tippen():
     if request.method == "POST":
         tipp = request.form.to_dict()
-        if (
-    tipp.get("tipper") != "Admin"
-    and ist_etappe_gesperrt(tipp.get("etappe"))
-):
+if tipp.get("tipper") != "Admin" and ist_etappe_gesperrt(tipp.get("etappe")):
     flash("Diese Tipprunde ist bereits gesperrt.", "error")
     return redirect(url_for("tippen"))
         if tipp.get("tipper") == "Admin":
@@ -276,6 +270,40 @@ def tippen():
         kategorie_labels=KATEGORIE_LABELS
     )
 
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    admin_code = request.values.get("admin_code", "")
+
+    if admin_code != os.environ.get("ADMIN_CODE", "Ulle"):
+        if request.method == "POST":
+            flash("Falscher Admin-Code!", "error")
+        return render_template("admin.html", eingeloggt=False)
+
+    if request.method == "POST":
+        etappe = request.form.get("etappe")
+        aktion = request.form.get("aktion")
+
+        if etappe and aktion == "sperren":
+            setze_etappe_gesperrt(etappe, True)
+            flash(f"{etappe} wurde gesperrt.", "success")
+
+        elif etappe and aktion == "entsperren":
+            setze_etappe_gesperrt(etappe, False)
+            flash(f"{etappe} wurde wieder geöffnet.", "success")
+
+    etappen_status = []
+    for etappe in load_etappen():
+        etappen_status.append({
+            "etappe": etappe,
+            "gesperrt": ist_etappe_gesperrt(etappe)
+        })
+
+    return render_template(
+        "admin.html",
+        eingeloggt=True,
+        admin_code=admin_code,
+        etappen_status=etappen_status
+    )
 
 if __name__ == "__main__":
     app.run()
