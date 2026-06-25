@@ -68,6 +68,10 @@ class Tipp(db.Model):
         db.UniqueConstraint("tipper", "etappe", name="unique_tipper_etappe"),
     )
 
+class EtappenStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    etappe = db.Column(db.String(200), unique=True, nullable=False)
+    gesperrt = db.Column(db.Boolean, default=False)
 
 with app.app_context():
     db.create_all()
@@ -89,7 +93,25 @@ def load_teams():
 def load_etappen():
     return read_lines_from_file(os.path.join(DATA_DIR, "etappen.txt"))
 
+def ist_etappe_gesperrt(etappe):
+    status = EtappenStatus.query.filter_by(etappe=etappe).first()
+    return status.gesperrt if status else False
 
+
+def setze_etappe_gesperrt(etappe, gesperrt):
+    status = EtappenStatus.query.filter_by(etappe=etappe).first()
+
+    if not status:
+        status = EtappenStatus(
+            etappe=etappe,
+            gesperrt=gesperrt
+        )
+        db.session.add(status)
+    else:
+        status.gesperrt = gesperrt
+
+    db.session.commit()
+    
 def load_tipps():
     return [t.daten for t in Tipp.query.all()]
 
@@ -208,7 +230,12 @@ def index():
 def tippen():
     if request.method == "POST":
         tipp = request.form.to_dict()
-
+        if (
+    tipp.get("tipper") != "Admin"
+    and ist_etappe_gesperrt(tipp.get("etappe"))
+):
+    flash("Diese Tipprunde ist bereits gesperrt.", "error")
+    return redirect(url_for("tippen"))
         if tipp.get("tipper") == "Admin":
             admin_code = tipp.get("admin_code", "")
             if admin_code != os.environ.get("ADMIN_CODE", "Ulle"):
