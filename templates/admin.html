@@ -130,6 +130,7 @@
           <th>Name</th>
           <th>Rolle</th>
           <th>Status</th>
+          <th>Aktionen</th>
         </tr>
       </thead>
       <tbody>
@@ -150,6 +151,36 @@
                 <span class="badge text-bg-danger">Inaktiv</span>
               {% endif %}
             </td>
+            <td>
+            <form method="post" class="d-inline">
+                <input type="hidden" name="admin_code" value="{{ admin_code }}">
+                <input type="hidden" name="aktion" value="benutzer_loeschen">
+                <input type="hidden" name="benutzer_id" value="{{ b.id }}">
+                <button class="btn btn-sm btn-danger">
+                    Löschen
+                </button>
+            </form>
+        
+            <br><br>
+        
+            <form method="post">
+                <input type="hidden" name="admin_code" value="{{ admin_code }}">
+                <input type="hidden" name="aktion" value="passwort_setzen">
+                <input type="hidden" name="benutzer_id" value="{{ b.id }}">
+        
+                <input
+                    class="form-control form-control-sm mb-2"
+                    type="text"
+                    name="neues_passwort"
+                    placeholder="Neues Passwort">
+        
+                <button class="btn btn-sm btn-primary">
+                    Passwort ändern
+                </button>
+        
+            </form>
+        
+        </td>
           </tr>
         {% endfor %}
       </tbody>
