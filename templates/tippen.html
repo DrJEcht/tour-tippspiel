@@ -77,8 +77,14 @@
     <select name="etappe" required onchange="reloadForm(); toggleFelder()">
       <option value="">--</option>
       {% for e in etappen %}
-        <option value="{{ e }}" {% if e == request.args.get('etappe') %}selected{% endif %}>{{ e }}</option>
-      {% endfor %}
+      <option 
+        value="{{ e }}"
+        {% if e == request.args.get('etappe') %}selected{% endif %}
+        {% if e in gesperrte_etappen and request.args.get('tipper') != 'Admin' %}disabled{% endif %}
+      >
+        {{ e }}{% if e in gesperrte_etappen and request.args.get('tipper') != 'Admin' %} 🔒{% endif %}
+      </option>
+    {% endfor %}
     </select>
     <br><br>
 
