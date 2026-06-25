@@ -2,84 +2,179 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Tour de France Tippspiel 2026</title>
+  <title>Tour de France Tippspiel 2025</title>
 
   <style>
     body {
       font-family: sans-serif;
+      margin: 30px;
+      background: #f7f7f7;
+      color: #222;
     }
+
+    h1, h2 {
+      color: #222;
+    }
+
+    a {
+      color: #005bbb;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
     table {
       border-collapse: collapse;
       margin-bottom: 30px;
+      width: 100%;
+      background: white;
     }
+
     th, td {
-      border: 1px solid #999;
-      padding: 6px 10px;
+      border: 1px solid #ccc;
+      padding: 8px 10px;
       text-align: left;
+      vertical-align: top;
     }
+
     th {
       background-color: #eee;
     }
+
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
     .punkte {
       font-weight: bold;
       color: green;
+      text-align: center;
     }
-    .korrekt-3 { color: darkgreen; font-weight: bold; }
-    .korrekt-2 { color: orange; }
-    .korrekt-1 { color: red; }
-    .korrekt-0 { color: #aaa; }
+
+    .punktzahl {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    .korrekt-3 {
+      background: #d8f5d0;
+    }
+
+    .korrekt-2 {
+      background: #fff1c2;
+    }
+
+    .korrekt-1 {
+      background: #ffe0c2;
+    }
+
+    .korrekt-0 {
+      background: #f3f3f3;
+      color: #777;
+    }
+
+    select {
+      padding: 8px;
+      font-size: 1em;
+      min-width: 260px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .gesamtpunkte {
+      font-weight: bold;
+      color: green;
+    }
   </style>
 </head>
+
 <body>
   <h1>🏁 Tour de France Tippspiel 2025</h1>
-    <p><a href="{{ url_for('tippen') }}">Tipp abgeben</a></p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Platz</th>
-        <th>Tipper</th>
-        <th>Gesamtpunkte</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for name, daten in rangliste %}
+  <p><a href="{{ url_for('tippen') }}">Tipp abgeben</a></p>
+
+  <div class="card">
+    <h2>Gesamtrangliste</h2>
+
+    <table>
+      <thead>
         <tr>
-          <td>{{ loop.index }}.</td>
-          <td>{{ name }}</td>
-          <td class="punkte">{{ daten.gesamtpunkte }}</td>
+          <th>Platz</th>
+          <th>Tipper</th>
+          <th>Gesamtpunkte</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% for name, daten in rangliste %}
-    <h2>{{ name }}</h2>
-    {% for tipp in daten.tipps %}
-      <h3>Etappe: {{ tipp.etappe }}</h3>
-      <table>
-        <thead>
+      </thead>
+      <tbody>
+        {% for name, daten in rangliste %}
           <tr>
-            <th>Kategorie</th>
-            <th>Dein Tipp</th>
-            <th>Punkte</th>
+            <td>{{ loop.index }}.</td>
+            <td>{{ name }}</td>
+            <td class="gesamtpunkte">{{ daten.gesamtpunkte }}</td>
           </tr>
-        </thead>
-        <tbody>
-          {% for kategorie in kategorien %}
-            {% if tipp.daten[kategorie] %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Tipps pro Runde</h2>
+
+    <form method="get">
+      <label for="etappe"><strong>Tipprunde auswählen:</strong></label>
+      <select name="etappe" id="etappe" onchange="this.form.submit()">
+        {% for e in etappen %}
+          <option value="{{ e }}" {% if e == ausgewaehlte_etappe %}selected{% endif %}>
+            {{ e }}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+
+    <br>
+
+    {% if tipps_etappe %}
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipper</th>
+              {% for kategorie in kategorien %}
+                <th>{{ kategorie_labels[kategorie] if kategorie in kategorie_labels else kategorie.replace('_', ' ').capitalize() }}</th>
+              {% endfor %}
+              <th>Punkte</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for tipp in tipps_etappe %}
               <tr>
-                <td>{{ kategorie.replace('_', ' ').capitalize() }}</td>
-                <td>{{ tipp.daten[kategorie] }}</td>
-               {% set pkt = tipp.korrekt.get(kategorie, 0) %}
-                <td class="korrekt-{{ pkt }}">{{ pkt }}</td>
+                <td><strong>{{ tipp.name }}</strong></td>
+
+                {% for kategorie in kategorien %}
+                  {% set pkt = tipp.korrekt.get(kategorie, 0) %}
+                  <td class="korrekt-{{ pkt }}">
+                    {{ tipp.daten.get(kategorie, '') or '-' }}
+                    <span class="punktzahl">{{ pkt }} Pkt.</span>
+                  </td>
+                {% endfor %}
+
+                <td class="punkte">{{ tipp.punkte }}</td>
               </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endfor %}
-  {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>Für diese Tipprunde wurden noch keine ausgewerteten Tipps angezeigt.</p>
+    {% endif %}
+  </div>
 
 </body>
 </html>
