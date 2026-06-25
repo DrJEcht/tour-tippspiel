@@ -274,7 +274,7 @@ def tippen():
 
     return render_template(
         "tippen.html",
-        tipper=TIPPER,
+        tipper=[b.name for b in Benutzer.query.filter_by(aktiv=True, ist_admin=False).order_by(Benutzer.name).all()],
         kategorien=kategorien,
         fahrer_liste=load_fahrer(),
         teams=load_teams(),
