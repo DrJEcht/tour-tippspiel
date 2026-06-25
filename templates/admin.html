@@ -84,6 +84,79 @@
           </table>
         </div>
       </div>
+      <div class="card shadow-sm mt-4">
+  <div class="card-header">
+    <strong>Benutzer anlegen</strong>
+  </div>
+
+  <div class="card-body">
+    <form method="post" class="row g-3">
+      <input type="hidden" name="admin_code" value="{{ admin_code }}">
+      <input type="hidden" name="aktion" value="benutzer_anlegen">
+
+      <div class="col-md-4">
+        <label class="form-label">Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Passwort</label>
+        <input type="password" name="passwort" class="form-control" required>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="ist_admin" id="ist_admin">
+          <label class="form-check-label" for="ist_admin">Admin</label>
+        </div>
+      </div>
+
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Anlegen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+  <div class="card-header">
+    <strong>Benutzerliste</strong>
+  </div>
+
+  <div class="card-body">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Rolle</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in benutzer %}
+          <tr>
+            <td>{{ b.name }}</td>
+            <td>
+              {% if b.ist_admin %}
+                <span class="badge text-bg-dark">Admin</span>
+              {% else %}
+                <span class="badge text-bg-secondary">Tipper</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if b.aktiv %}
+                <span class="badge text-bg-success">Aktiv</span>
+              {% else %}
+                <span class="badge text-bg-danger">Inaktiv</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+    
     {% endif %}
   </div>
 </body>
