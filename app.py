@@ -354,7 +354,7 @@ def admin():
         "admin.html",
         eingeloggt=True,
         admin_code=admin_code,
-        etappen_status=etappen_status
+        etappen_status=etappen_status,
         benutzer=Benutzer.query.order_by(Benutzer.name).all()
     )
 
