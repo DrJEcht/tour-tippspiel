@@ -85,6 +85,16 @@ class Benutzer(db.Model):
 with app.app_context():
     db.create_all()
 
+with app.app_context():
+    if not Benutzer.query.filter_by(name="Admin").first():
+        admin = Benutzer(
+            name="Admin",
+            passwort_hash=generate_password_hash("Ulle"),
+            ist_admin=True,
+            aktiv=True
+        )
+        db.session.add(admin)
+        db.session.commit()
 
 def read_lines_from_file(filename):
     with open(filename, "r", encoding="utf-8") as f:
