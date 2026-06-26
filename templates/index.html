@@ -94,6 +94,41 @@
 }
 
 
+  .mobile-tipps {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-tipps {
+    display: none;
+  }
+
+  .mobile-tipps {
+    display: block;
+  }
+
+  .tipp-card-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+  }
+
+  .tipp-card-row:last-child {
+    border-bottom: none;
+  }
+
+  .tipp-label {
+    font-weight: 600;
+    color: #555;
+  }
+
+  .tipp-value {
+    text-align: right;
+  }
+}
+
 
     
   </style>
@@ -170,7 +205,7 @@
         </form>
 
         {% if tipps_etappe %}
-          <div class="table-responsive">
+          <div class="table-responsive desktop-tipps">
             <table class="table table-bordered table-hover align-middle">
               <thead class="table-light">
                 <tr>
@@ -206,6 +241,36 @@
               </tbody>
             </table>
           </div>
+
+
+          <div class="mobile-tipps">
+            {% for tipp in tipps_etappe %}
+              <div class="card mb-3 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <strong>{{ tipp.name }}</strong>
+                  <span class="badge text-bg-primary">{{ tipp.punkte }} Punkte</span>
+                </div>
+          
+                <div class="card-body">
+                  {% for kategorie in kategorien %}
+                    {% set pkt = tipp.korrekt.get(kategorie, 0) %}
+                    <div class="tipp-card-row score-{{ pkt }}">
+                      <div class="tipp-label">
+                        {{ kategorie_labels[kategorie] if kategorie in kategorie_labels else kategorie.replace('_', ' ').capitalize() }}
+                      </div>
+                      <div class="tipp-value">
+                        {{ tipp.daten.get(kategorie, '') or '-' }}
+                        <br>
+                        <small>{{ pkt }} Pkt.</small>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+        
 
           <div class="mt-3 small text-muted">
             🟩 3 Punkte · 🟨 2 Punkte · 🟧 1 Punkt · ⬜ 0 Punkte
