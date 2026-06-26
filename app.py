@@ -47,16 +47,16 @@ ALL_KATEGORIEN = get_admin_kategorien()
 
 
 KATEGORIE_LABELS = {
-    "etappe_gewinner_fahrer": "Etappensieger",
-    "etappe_gewinner_team": "Team",
-    "gelbes_trikot": "Gelb",
-    "gruenes_trikot": "Grün",
-    "gepunktetes_trikot": "Berg",
-    "weisses_trikot": "Weiß",
-    "gesamtsieger_tour": "Gesamt Gelb",
-    "gesamtsieger_gruen": "Gesamt Grün",
-    "gesamtsieger_gepunktet": "Gesamt Berg",
-    "gesamtsieger_weiss": "Gesamt Weiß",
+    "etappe_gewinner_fahrer": "Welcher Fahrer wird Etappensieger",
+    "etappe_gewinner_team": "Welches Team gewinnt die Etappe",
+    "gelbes_trikot": "Welcher Fahrer ist nach der Etappe im Gelben Trikot",
+    "gruenes_trikot": "Welcher Fahrer ist nach der Etappe im Grünen Trikot",
+    "gepunktetes_trikot": "Welcher Fahrer ist nach der Etappe im Polka Dot Trikot",
+    "weisses_trikot": "Welcher Fahrer ist nach der Etappe im weißen Trikot",
+    "gesamtsieger_tour": "Welcher Fahrer ist gewinnt das Gesamtklassement",
+    "gesamtsieger_gruen": "Welcher Fahrer gewinnt die Sprint-Gesamtwertung",
+    "gesamtsieger_gepunktet": "Welcher Fahrer gewinnt die Berg-Gesamtwertung",
+    "gesamtsieger_weiss": "Welcher Fahrer gewinnt die Nachwuchs-Gesamtwertung",
 }
 
 
