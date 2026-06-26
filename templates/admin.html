@@ -67,7 +67,7 @@
                   </td>
                   <td>
                     <form method="post" class="d-inline">
-                      <input type="hidden" name="admin_code" value="{{ admin_code }}">
+                      
                       <input type="hidden" name="etappe" value="{{ item.etappe }}">
 
                       {% if item.gesperrt %}
@@ -92,7 +92,7 @@
 
   <div class="card-body">
     <form method="post" class="row g-3">
-      <input type="hidden" name="admin_code" value="{{ admin_code }}">
+      
       <input type="hidden" name="aktion" value="benutzer_anlegen">
 
       <div class="col-md-4">
@@ -154,7 +154,7 @@
             </td>
             <td>
             <form method="post" class="d-inline">
-                <input type="hidden" name="admin_code" value="{{ admin_code }}">
+                
                 <input type="hidden" name="aktion" value="benutzer_loeschen">
                 <input type="hidden" name="benutzer_id" value="{{ b.id }}">
                 <button class="btn btn-sm btn-danger">
@@ -165,7 +165,7 @@
             <br><br>
         
             <form method="post">
-                <input type="hidden" name="admin_code" value="{{ admin_code }}">
+                
                 <input type="hidden" name="aktion" value="passwort_setzen">
                 <input type="hidden" name="benutzer_id" value="{{ b.id }}">
         
