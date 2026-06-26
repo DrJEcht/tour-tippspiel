@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, redirect, url_for, flash
+from flask import Flask, request, render_template, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 
@@ -234,52 +234,37 @@ def index():
 
 @app.route("/tippen", methods=["GET", "POST"])
 def tippen():
+    if "benutzer_id" not in session:
+        flash("Bitte melde dich zuerst an.", "error")
+        return redirect(url_for("login"))
+
+    benutzer = Benutzer.query.get(session["benutzer_id"])
+
+    if not benutzer or not benutzer.aktiv:
+        session.clear()
+        flash("Dein Benutzer ist nicht mehr aktiv.", "error")
+        return redirect(url_for("login"))
+
     if request.method == "POST":
         tipp = request.form.to_dict()
-        benutzer = Benutzer.query.filter_by(
-            name=tipp.get("tipper"),
-            aktiv=True
-        ).first()
-        
-        if not benutzer:
-            flash("Unbekannter oder inaktiver Benutzer.", "error")
-            return redirect(url_for("tippen"))
-        
-        passwort = tipp.get("passwort", "")
-        
-        if not check_password_hash(benutzer.passwort_hash, passwort):
-            flash("Falsches Passwort.", "error")
-            return redirect(url_for("tippen"))
+        tipp["tipper"] = benutzer.name
 
-
-        
-        if tipp.get("tipper") != "Admin" and ist_etappe_gesperrt(tipp.get("etappe")):
+        if not benutzer.ist_admin and ist_etappe_gesperrt(tipp.get("etappe")):
             flash("Diese Tipprunde ist bereits gesperrt.", "error")
-            return redirect(url_for("tippen"))
-
-        if tipp.get("tipper") == "Admin":
-            admin_code = tipp.get("admin_code", "")
-            if admin_code != os.environ.get("ADMIN_CODE", "Ulle"):
-                flash("Falscher Admin-Code!", "error")
-                return redirect(url_for("tippen", tipper="Admin"))
-
-        if tipp.get("tipper") not in TIPPER:
-            flash("Ungültiger Tipper!", "error")
             return redirect(url_for("tippen"))
 
         save_tipp(tipp)
         flash("Tipp erfolgreich gespeichert!", "success")
         return redirect(url_for("index"))
 
-    tipp_auswahl_tipper = request.args.get("tipper")
     tipp_auswahl_etappe = request.args.get("etappe")
 
-    kategorien = ALL_KATEGORIEN if tipp_auswahl_tipper == "Admin" else BASIS_KATEGORIEN
+    kategorien = ALL_KATEGORIEN if benutzer.ist_admin else BASIS_KATEGORIEN
 
     vorbefuellung = {}
-    if tipp_auswahl_tipper and tipp_auswahl_etappe:
+    if tipp_auswahl_etappe:
         vorhandener_tipp = Tipp.query.filter_by(
-            tipper=tipp_auswahl_tipper,
+            tipper=benutzer.name,
             etappe=tipp_auswahl_etappe
         ).first()
 
@@ -290,7 +275,7 @@ def tippen():
 
     return render_template(
         "tippen.html",
-        tipper=[b.name for b in Benutzer.query.filter_by(aktiv=True, ist_admin=False).order_by(Benutzer.name).all()],
+        aktueller_benutzer=benutzer,
         kategorien=kategorien,
         fahrer_liste=load_fahrer(),
         teams=load_teams(),
@@ -302,6 +287,7 @@ def tippen():
         vorbefuellung=vorbefuellung,
         kategorie_labels=KATEGORIE_LABELS
     )
+
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -390,6 +376,39 @@ def admin():
         etappen_status=etappen_status,
         benutzer=Benutzer.query.order_by(Benutzer.name).all()
     )
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        passwort = request.form.get("passwort", "")
+
+        benutzer = Benutzer.query.filter_by(name=name, aktiv=True).first()
+
+        if not benutzer or not check_password_hash(benutzer.passwort_hash, passwort):
+            flash("Name oder Passwort ist falsch.", "error")
+            return redirect(url_for("login"))
+
+        session["benutzer_id"] = benutzer.id
+        session["benutzer_name"] = benutzer.name
+        session["ist_admin"] = benutzer.ist_admin
+
+        flash(f"Willkommen, {benutzer.name}!", "success")
+
+        if benutzer.ist_admin:
+            return redirect(url_for("admin"))
+
+        return redirect(url_for("tippen"))
+
+    benutzer_liste = Benutzer.query.filter_by(aktiv=True).order_by(Benutzer.name).all()
+    return render_template("login.html", benutzer_liste=benutzer_liste)
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    flash("Du wurdest abgemeldet.", "success")
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run()
