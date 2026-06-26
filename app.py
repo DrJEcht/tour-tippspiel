@@ -410,5 +410,32 @@ def logout():
     flash("Du wurdest abgemeldet.", "success")
     return redirect(url_for("index"))
 
+@app.route("/admin/tipps", methods=["GET", "POST"])
+def admin_tipps():
+    if not session.get("ist_admin"):
+        flash("Nur Admins dürfen diese Seite öffnen.", "error")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        aktion = request.form.get("aktion")
+
+        if aktion == "tipp_loeschen":
+            tipp_id = request.form.get("tipp_id")
+            tipp = Tipp.query.get(tipp_id)
+
+            if tipp:
+                db.session.delete(tipp)
+                db.session.commit()
+                flash("Tipp wurde gelöscht.", "success")
+
+        return redirect(url_for("admin_tipps"))
+
+    tipps = Tipp.query.order_by(Tipp.etappe, Tipp.tipper).all()
+
+    return render_template(
+        "admin_tipps.html",
+        tipps=tipps
+    )
+
 if __name__ == "__main__":
     app.run()
