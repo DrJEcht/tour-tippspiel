@@ -434,5 +434,36 @@ def admin_tipps():
         tipps=tipps
     )
 
+
+@app.route("/registrieren", methods=["GET", "POST"])
+def registrieren():
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        passwort = request.form.get("passwort", "").strip()
+
+        if not name or not passwort:
+            flash("Name und Passwort sind erforderlich.", "error")
+            return redirect(url_for("registrieren"))
+
+        if Benutzer.query.filter_by(name=name).first():
+            flash("Dieser Benutzername ist bereits vergeben.", "error")
+            return redirect(url_for("registrieren"))
+
+        benutzer = Benutzer(
+            name=name,
+            passwort_hash=generate_password_hash(passwort),
+            ist_admin=False,
+            aktiv=True
+        )
+
+        db.session.add(benutzer)
+        db.session.commit()
+
+        flash("Benutzer wurde angelegt. Du kannst dich jetzt einloggen.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("registrieren.html")
+
+
 if __name__ == "__main__":
     app.run()
