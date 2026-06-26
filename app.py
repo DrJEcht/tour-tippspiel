@@ -53,7 +53,7 @@ KATEGORIE_LABELS = {
     "gruenes_trikot": "Welcher Fahrer ist nach der Etappe im Grünen Trikot",
     "gepunktetes_trikot": "Welcher Fahrer ist nach der Etappe im Polka Dot Trikot",
     "weisses_trikot": "Welcher Fahrer ist nach der Etappe im Weißen Trikot",
-    "gesamtsieger_tour": "Welcher Fahrer ist gewinnt die Gesamtwertung",
+    "gesamtsieger_tour": "Welcher Fahrer gewinnt die Gesamtwertung",
     "gesamtsieger_gruen": "Welcher Fahrer gewinnt die Sprint-Gesamtwertung",
     "gesamtsieger_gepunktet": "Welcher Fahrer gewinnt die Berg-Gesamtwertung",
     "gesamtsieger_weiss": "Welcher Fahrer gewinnt die Nachwuchs-Gesamtwertung",
