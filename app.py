@@ -291,29 +291,25 @@ def tippen():
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
-    admin_code = request.values.get("admin_code", "")
-
-    if admin_code != os.environ.get("ADMIN_CODE", "Ulle"):
-        if request.method == "POST":
-            flash("Falscher Admin-Code!", "error")
-        return render_template("admin.html", eingeloggt=False)
+    if not session.get("ist_admin"):
+        flash("Nur Admins dürfen diese Seite öffnen.", "error")
+        return redirect(url_for("login"))
 
     if request.method == "POST":
         etappe = request.form.get("etappe")
         aktion = request.form.get("aktion")
-    
-        # Benutzer anlegen
+
         if aktion == "benutzer_anlegen":
             name = request.form.get("name", "").strip()
             passwort = request.form.get("passwort", "").strip()
             ist_admin = request.form.get("ist_admin") == "on"
-    
+
             if not name or not passwort:
                 flash("Name und Passwort sind erforderlich.", "error")
-    
+
             elif Benutzer.query.filter_by(name=name).first():
                 flash("Benutzer existiert bereits.", "error")
-    
+
             else:
                 benutzer = Benutzer(
                     name=name,
@@ -321,46 +317,38 @@ def admin():
                     ist_admin=ist_admin,
                     aktiv=True
                 )
-    
                 db.session.add(benutzer)
                 db.session.commit()
-    
                 flash(f"Benutzer '{name}' wurde angelegt.", "success")
-    
-        # Benutzer löschen
+
         elif aktion == "benutzer_loeschen":
             benutzer_id = request.form.get("benutzer_id")
-    
             benutzer = Benutzer.query.get(benutzer_id)
-    
+
             if benutzer:
                 db.session.delete(benutzer)
                 db.session.commit()
-    
                 flash(f"Benutzer '{benutzer.name}' wurde gelöscht.", "success")
-    
-        # Passwort ändern
+
         elif aktion == "passwort_setzen":
             benutzer_id = request.form.get("benutzer_id")
             neues_passwort = request.form.get("neues_passwort", "").strip()
-    
             benutzer = Benutzer.query.get(benutzer_id)
-    
+
             if benutzer and neues_passwort:
                 benutzer.passwort_hash = generate_password_hash(neues_passwort)
                 db.session.commit()
-    
                 flash(f"Passwort von '{benutzer.name}' wurde geändert.", "success")
-    
-        # Etappe sperren
+
         elif aktion == "sperren" and etappe:
             setze_etappe_gesperrt(etappe, True)
             flash(f"{etappe} wurde gesperrt.", "success")
-    
-        # Etappe entsperren
+
         elif aktion == "entsperren" and etappe:
             setze_etappe_gesperrt(etappe, False)
             flash(f"{etappe} wurde wieder geöffnet.", "success")
+
+        return redirect(url_for("admin"))
 
     etappen_status = []
     for etappe in load_etappen():
@@ -372,7 +360,6 @@ def admin():
     return render_template(
         "admin.html",
         eingeloggt=True,
-        admin_code=admin_code,
         etappen_status=etappen_status,
         benutzer=Benutzer.query.order_by(Benutzer.name).all()
     )
