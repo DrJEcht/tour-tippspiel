@@ -236,7 +236,23 @@ def index():
 def tippen():
     if request.method == "POST":
         tipp = request.form.to_dict()
+        benutzer = Benutzer.query.filter_by(
+            name=tipp.get("tipper"),
+            aktiv=True
+        ).first()
+        
+        if not benutzer:
+            flash("Unbekannter oder inaktiver Benutzer.", "error")
+            return redirect(url_for("tippen"))
+        
+        passwort = tipp.get("passwort", "")
+        
+        if not check_password_hash(benutzer.passwort_hash, passwort):
+            flash("Falsches Passwort.", "error")
+            return redirect(url_for("tippen"))
 
+
+        
         if tipp.get("tipper") != "Admin" and ist_etappe_gesperrt(tipp.get("etappe")):
             flash("Diese Tipprunde ist bereits gesperrt.", "error")
             return redirect(url_for("tippen"))
