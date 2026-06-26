@@ -43,17 +43,73 @@
     .table-responsive {
       overflow-x: auto;
     }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+  .page-title {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .container-fluid {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .page-header {
+    display: block;
+  }
+
+  .page-title {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .header-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .header-buttons .btn {
+    width: 100%;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+}
+
+
+
+    
   </style>
 </head>
 
 <body>
   <div class="container-fluid py-4 px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="mb-0">🏁 Tour de France Tippspiel 2026</h1>
-      <a class="btn btn-outline-secondary" href="{{ url_for('registrieren') }}">Registrieren</a>
-      <a class="btn btn-primary" href="{{ url_for('tippen') }}">Tipp abgeben</a>
-      <a class="btn btn-outline-dark" href="{{ url_for('admin') }}">Admin</a>
+    <div class="page-header mb-4">
+      <h1 class="page-title">🏁 Tour de France Tippspiel 2026</h1>
+    
+      <div class="header-buttons">
+        <a class="btn btn-outline-secondary" href="{{ url_for('registrieren') }}">Registrieren</a>
+        <a class="btn btn-primary" href="{{ url_for('tippen') }}">Tipp abgeben</a>
+        <a class="btn btn-outline-dark" href="{{ url_for('admin') }}">Admin</a>
     </div>
+  </div>
 
     <div class="card mb-4 shadow-sm">
       <div class="card-header">
