@@ -58,7 +58,10 @@ KATEGORIE_LABELS = {
     "gesamtsieger_gepunktet": "Welcher Fahrer gewinnt die Berg-Gesamtwertung",
     "gesamtsieger_weiss": "Welcher Fahrer gewinnt die Nachwuchs-Gesamtwertung",
 }
-
+class StartseitenInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bild_url = db.Column(db.String(500))
+    text = db.Column(db.Text)
 
 class Tipp(db.Model):
     id = db.Column(db.Integer, primary_key=True)
