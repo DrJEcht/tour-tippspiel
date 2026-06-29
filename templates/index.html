@@ -145,6 +145,23 @@
         <a class="btn btn-outline-dark" href="{{ url_for('admin') }}">Admin</a>
     </div>
   </div>
+  {% if startseiten_info and (startseiten_info.bild_url or startseiten_info.text) %}
+  <div class="card shadow-sm mb-4">
+    {% if startseiten_info.bild_url %}
+      <img
+        src="{{ startseiten_info.bild_url }}"
+        class="card-img-top"
+        alt="Startseitenbild"
+        style="max-height: 320px; object-fit: cover;">
+    {% endif %}
+
+    {% if startseiten_info.text %}
+      <div class="card-body">
+        <p class="mb-0">{{ startseiten_info.text }}</p>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
 
     <div class="card mb-4 shadow-sm">
       <div class="card-header">
