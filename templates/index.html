@@ -157,7 +157,9 @@
 
     {% if startseiten_info.text %}
       <div class="card-body">
-        <p class="mb-0">{{ startseiten_info.text }}</p>
+        <div class="mb-0">
+        {{ startseiten_info.text|safe }}
+        </div>
       </div>
     {% endif %}
   </div>
