@@ -40,6 +40,35 @@
         </div>
       </div>
     {% else %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <strong>Startseiten-Info</strong>
+        </div>
+      
+        <div class="card-body">
+          <form method="post">
+            <input type="hidden" name="aktion" value="startseite_speichern">
+      
+            <label class="form-label">Bild-URL</label>
+            <input
+              type="text"
+              name="bild_url"
+              class="form-control mb-3"
+              value="{{ startseiten_info.bild_url if startseiten_info else '' }}"
+              placeholder="https://...">
+      
+            <label class="form-label">Beschreibung</label>
+            <textarea
+              name="text"
+              class="form-control mb-3"
+              rows="4"
+              placeholder="Kurze Beschreibung für die Startseite">{{ startseiten_info.text if startseiten_info else '' }}</textarea>
+      
+            <button class="btn btn-primary">Speichern</button>
+          </form>
+        </div>
+      </div>
+    
       <div class="card shadow-sm">
         <div class="card-header">
           <strong>Tipprunden sperren / öffnen</strong>
