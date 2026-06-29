@@ -97,7 +97,11 @@
   .mobile-tipps {
   display: none;
 }
-
+@media (max-width: 768px) {
+    .startbild {
+        max-height: 200px !important;
+    }
+}
 @media (max-width: 768px) {
   .desktop-tipps {
     display: none;
@@ -152,9 +156,9 @@
         <div class="text-center pt-3">
           <img
             src="{{ url_for('static', filename='bilder/' + startseiten_info.bild_url) }}"
-            class="img-fluid rounded"
+            class="img-fluid rounded mx-auto d-block startbild"
             alt="Startseitenbild"
-            style="max-height:320px; max-width:800px; object-fit:cover;">
+            style="width:100%; max-width:800px; max-height:320px; object-fit:cover;">
         </div>
       {% endif %}
   
