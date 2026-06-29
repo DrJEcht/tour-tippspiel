@@ -146,24 +146,27 @@
     </div>
   </div>
   {% if startseiten_info and (startseiten_info.bild_url or startseiten_info.text) %}
-  <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-4">
   
       {% if startseiten_info.bild_url %}
+        <div class="text-center pt-3">
           <img
-              src="{{ startseiten_info.bild_url }}"
-              class="card-img-top"
-              alt="Startseitenbild"
-              style="max-height:320px; max-width:800px; object-fit:cover;">
+            src="{{ startseiten_info.bild_url }}"
+            class="img-fluid rounded"
+            alt="Startseitenbild"
+            style="max-height:320px; max-width:800px; object-fit:cover;">
+        </div>
       {% endif %}
   
       {% if startseiten_info.text %}
-          <div class="card-body">
-              {{ startseiten_info.text|safe }}
-          </div>
+        <div class="card-body">
+          {{ startseiten_info.text|safe }}
+        </div>
       {% endif %}
   
-  </div>
-{% endif %}
+    </div>
+  {% endif %}
+  
     <div class="card mb-4 shadow-sm">
       <div class="card-header">
         <strong>🏆 Gesamtrangliste</strong>
