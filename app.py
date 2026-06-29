@@ -241,7 +241,8 @@ def index():
         etappen=etappen,
         ausgewaehlte_etappe=ausgewaehlte_etappe,
         tipps_etappe=tipps_etappe,
-        kategorie_labels=KATEGORIE_LABELS
+        kategorie_labels=KATEGORIE_LABELS,
+        startseiten_info=StartseitenInfo.query.first()
     )
 
 
