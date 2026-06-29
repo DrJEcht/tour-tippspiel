@@ -148,8 +148,8 @@
   {% if startseiten_info and (startseiten_info.bild_url or startseiten_info.text) %}
   <div class="card shadow-sm mb-4">
     {% if startseiten_info.bild_url %}
-      <img
-        src="{{ startseiten_info.bild_url }}"
+      <img 
+        src="{{ url_for('static', filename='bilder/' + startseiten_info.bild_url) }}">
         class="card-img-top"
         alt="Startseitenbild"
         style="max-height: 320px; object-fit: cover;">
