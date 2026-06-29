@@ -353,6 +353,21 @@ def admin():
                 db.session.commit()
                 flash(f"Passwort von '{benutzer.name}' wurde geändert.", "success")
 
+                elif aktion == "startseite_speichern":
+            bild_url = request.form.get("bild_url", "").strip()
+            text = request.form.get("text", "").strip()
+
+            info = StartseitenInfo.query.first()
+            if not info:
+                info = StartseitenInfo()
+                db.session.add(info)
+
+            info.bild_url = bild_url
+            info.text = text
+            db.session.commit()
+
+            flash("Startseiten-Info wurde gespeichert.", "success")
+        
         elif aktion == "sperren" and etappe:
             setze_etappe_gesperrt(etappe, True)
             flash(f"{etappe} wurde gesperrt.", "success")
@@ -374,7 +389,8 @@ def admin():
         "admin.html",
         eingeloggt=True,
         etappen_status=etappen_status,
-        benutzer=Benutzer.query.order_by(Benutzer.name).all()
+        benutzer=Benutzer.query.order_by(Benutzer.name).all(),
+        startseiten_info=StartseitenInfo.query.first()
     )
 
 @app.route("/login", methods=["GET", "POST"])
