@@ -320,10 +320,8 @@ def admin():
 
             if not name or not passwort:
                 flash("Name und Passwort sind erforderlich.", "error")
-
             elif Benutzer.query.filter_by(name=name).first():
                 flash("Benutzer existiert bereits.", "error")
-
             else:
                 benutzer = Benutzer(
                     name=name,
@@ -354,7 +352,7 @@ def admin():
                 db.session.commit()
                 flash(f"Passwort von '{benutzer.name}' wurde geändert.", "success")
 
-                elif aktion == "startseite_speichern":
+        elif aktion == "startseite_speichern":
             bild_url = request.form.get("bild_url", "").strip()
             text = request.form.get("text", "").strip()
 
@@ -366,9 +364,8 @@ def admin():
             info.bild_url = bild_url
             info.text = text
             db.session.commit()
-
             flash("Startseiten-Info wurde gespeichert.", "success")
-        
+
         elif aktion == "sperren" and etappe:
             setze_etappe_gesperrt(etappe, True)
             flash(f"{etappe} wurde gesperrt.", "success")
