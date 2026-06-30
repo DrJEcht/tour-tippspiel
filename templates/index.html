@@ -155,10 +155,16 @@
       {% if startseiten_info.bild_url %}
         <div class="text-center pt-3">
           <img
+    src="{{ url_for('static', filename='bilder/' + startseiten_info.bild_url) }}"
+    class="img-fluid rounded mx-auto d-block"
+    alt="Startseitenbild"
+    style="max-width:800px;">
+          
+          <img
             src="{{ url_for('static', filename='bilder/' + startseiten_info.bild_url) }}"
-            class="img-fluid rounded mx-auto d-block startbild"
+            class="img-fluid rounded mx-auto d-block"
             alt="Startseitenbild"
-            style="width:100%; max-width:800px; max-height:320px; object-fit:cover;">
+            style="max-width:800px;">
         </div>
       {% endif %}
   
