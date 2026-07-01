@@ -105,7 +105,40 @@ def read_lines_from_file(filename):
 
 
 def load_fahrer():
-    return read_lines_from_file(os.path.join(DATA_DIR, "fahrer.txt"))
+    fahrer = []
+
+    bereich = ""
+
+    with open(os.path.join(DATA_DIR, "fahrer.txt"), encoding="utf-8") as f:
+        for zeile in f:
+            zeile = zeile.strip()
+
+            if not zeile:
+                continue
+
+            if zeile.startswith("###"):
+                if "TOP GC" in zeile:
+                    bereich = "gc"
+                elif "TOP SPRINTER" in zeile:
+                    bereich = "sprinter"
+                else:
+                    bereich = ""
+                continue
+
+            if "(" in zeile:
+                name = zeile.split("(")[0].strip()
+                team = zeile.split("(")[1].replace(")", "").strip()
+
+                # kleine Bereinigung
+                team = team.replace("Team Team", "Team")
+
+                fahrer.append({
+                    "name": name,
+                    "team": team,
+                    "favorit": bereich in ["gc", "sprinter"]
+                })
+
+    return sorted(fahrer, key=lambda x: x["name"])
 
 
 def load_teams():
