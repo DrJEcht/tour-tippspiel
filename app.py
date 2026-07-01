@@ -106,7 +106,6 @@ def read_lines_from_file(filename):
 
 def load_fahrer():
     fahrer = []
-
     bereich = ""
 
     with open(os.path.join(DATA_DIR, "fahrer.txt"), encoding="utf-8") as f:
@@ -116,29 +115,31 @@ def load_fahrer():
             if not zeile:
                 continue
 
-            if zeile.startswith("###"):
-                if "TOP GC" in zeile:
+            if zeile.startswith("#"):
+                if "TOP GC" in zeile.upper():
                     bereich = "gc"
-                elif "TOP SPRINTER" in zeile:
+                elif "TOP SPRINTER" in zeile.upper():
                     bereich = "sprinter"
-                else:
-                    bereich = ""
+                elif "ALLE FAHRER" in zeile.upper():
+                    bereich = "alle"
                 continue
 
-            if "(" in zeile:
+            if "(" in zeile and ")" in zeile:
                 name = zeile.split("(")[0].strip()
                 team = zeile.split("(")[1].replace(")", "").strip()
-
-                # kleine Bereinigung
                 team = team.replace("Team Team", "Team")
+
+                favorit = bereich in ["gc", "sprinter"]
 
                 fahrer.append({
                     "name": name,
                     "team": team,
-                    "favorit": bereich in ["gc", "sprinter"]
+                    "favorit": favorit,
+                    "anzeige": f"{'⭐ ' if favorit else ''}{name} – {team}"
                 })
 
-    return sorted(fahrer, key=lambda x: x["name"])
+    # Favoriten zuerst, dann alphabetisch
+    return sorted(fahrer, key=lambda x: (not x["favorit"], x["name"]))
 
 
 def load_teams():
