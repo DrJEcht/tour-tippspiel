@@ -133,6 +133,20 @@
   }
 }
 
+  .startseitenbild {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  }
+
+@media (max-width: 768px) {
+    .startseitenbild {
+        max-width: 100%;
+      }
+      }
+
 
     
   </style>
@@ -156,9 +170,9 @@
         <div class="text-center pt-3">
           <img
             src="{{ url_for('static', filename='bilder/' + startseiten_info.bild_url) }}"
-            class="img-fluid rounded mx-auto d-block"
+            class="img-fluid rounded"
             alt="Startseitenbild"
-            style="max-width:800px;">
+            
         </div>
       {% endif %}
   
