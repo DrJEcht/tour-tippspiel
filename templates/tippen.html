@@ -101,8 +101,7 @@
                       value="{{ fahrer.name }}"
                       {% if vorbefuellung.get(kategorie) == fahrer.name %}selected{% endif %}
                     >
-                        {% if fahrer.favorit %}⭐ {% endif %}
-                        {{ fahrer.name }} – {{ fahrer.team }}
+                      {{ fahrer.anzeige }}
                     </option>
                   {% endfor %}
                 </select>
