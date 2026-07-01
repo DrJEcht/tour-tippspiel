@@ -95,8 +95,12 @@
                 <select name="{{ kategorie }}" id="{{ kategorie }}" class="form-select mb-3">
                   <option value="">--</option>
                   {% for fahrer in fahrer_liste %}
-                    <option value="{{ fahrer }}" {% if vorbefuellung.get(kategorie) == fahrer %}selected{% endif %}>
-                      {{ fahrer }}
+                    <option
+                      value="{{ fahrer.name }}"
+                      {% if vorbefuellung.get(kategorie) == fahrer.name %}selected{% endif %}
+                    >
+                        {% if fahrer.favorit %}⭐ {% endif %}
+                        {{ fahrer.name }} – {{ fahrer.team }}
                     </option>
                   {% endfor %}
                 </select>
