@@ -129,7 +129,7 @@ def load_fahrer():
                 team = zeile.split("(")[1].replace(")", "").strip()
                 team = team.replace("Team Team", "Team")
 
-                favorit = bereich in ["gc", "sprinter"]
+                #favorit = bereich in ["gc", "sprinter"]
 
                 symbol = ""
                 if bereich == "gc":
@@ -146,7 +146,17 @@ def load_fahrer():
                 })
 
     # Favoriten zuerst, dann alphabetisch
-    return sorted(fahrer, key=lambda x: (not x["favorit"], x["name"]))
+    def sortierung(fahrer):
+        if fahrer["symbol"] == "⭐":
+            gruppe = 0
+        elif fahrer["symbol"] == "⚡":
+            gruppe = 1
+        else:
+            gruppe = 2
+    
+        return (gruppe, fahrer["name"])
+
+    return sorted(fahrer, key=sortierung)
 
 
 def load_teams():
