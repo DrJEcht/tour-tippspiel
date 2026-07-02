@@ -116,17 +116,19 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      document.querySelectorAll(".fahrer-select").forEach(function (select) {
-        new TomSelect(select, {
-          create: false,
-          sortField: [],
-          Max Options: null,
-          placeholder: "Fahrer suchen..."
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".fahrer-select").forEach(function (select) {
+      new TomSelect(select, {
+        create: false,
+        sortField: [],
+        maxOptions: null,
+        placeholder: "Fahrer suchen...",
+        openOnFocus: true,
+        closeAfterSelect: true
       });
     });
-  </script>
+  });
+</script>
   
 </body>
 </html>
