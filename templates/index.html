@@ -136,8 +136,8 @@
 .startseitenbild {
     display: block;
     width: auto;
-    max-width: 100px;
-    max-height: 20px;
+    max-width: 400px;
+    max-height: 200px;
     height: auto;
     margin: 20px auto;
     border-radius: 12px;
@@ -173,7 +173,7 @@
         <div class="text-center pt-3">
           <img
             src="{{ url_for('static', filename='bilder/' + startseiten_info.bild_url) }}"
-            class="img-fluid rounded"
+            class="startseitenbild"
             alt="Startseitenbild"
             
         </div>
