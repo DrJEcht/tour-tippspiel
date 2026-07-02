@@ -131,11 +131,18 @@ def load_fahrer():
 
                 favorit = bereich in ["gc", "sprinter"]
 
+                symbol = ""
+                if bereich == "gc":
+                    symbol = "⭐"
+                
+                elif bereich == "sprinter":
+                    symbol = "⚡"
+                
                 fahrer.append({
                     "name": name,
                     "team": team,
-                    "favorit": favorit,
-                    "anzeige": f"{'⭐ ' if favorit else ''}{name} – {team}"
+                    "symbol": symbol,
+                    "anzeige": f"{symbol + ' ' if symbol else ''}{name} – {team}"
                 })
 
     # Favoriten zuerst, dann alphabetisch
