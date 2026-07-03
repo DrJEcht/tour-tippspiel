@@ -80,37 +80,51 @@
               <tr>
                 <th>Tipprunde</th>
                 <th>Status</th>
+                <th>Sperrzeit</th>
                 <th>Aktion</th>
               </tr>
             </thead>
+        
             <tbody>
               {% for item in etappen_status %}
-                <tr>
-                  <td>{{ item.etappe }}</td>
-                  <td>
-                    {% if item.gesperrt %}
-                      <span class="badge text-bg-danger">Gesperrt</span>
-                    {% else %}
-                      <span class="badge text-bg-success">Offen</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <form method="post" class="d-inline">
-                      
-                      <input type="hidden" name="etappe" value="{{ item.etappe }}">
-
-                      {% if item.gesperrt %}
-                        <input type="hidden" name="aktion" value="entsperren">
-                        <button class="btn btn-sm btn-outline-success">Entsperren</button>
-                      {% else %}
-                        <input type="hidden" name="aktion" value="sperren">
-                        <button class="btn btn-sm btn-outline-danger">Sperren</button>
-                      {% endif %}
-                    </form>
-                  </td>
-                </tr>
+              <tr>
+        
+                <td>{{ item.etappe }}</td>
+        
+                <td>
+                  {% if item.gesperrt %}
+                    <span class="badge text-bg-danger">🔒 Gesperrt</span>
+                  {% else %}
+                    <span class="badge text-bg-success">🟢 Offen</span>
+                  {% endif %}
+                </td>
+        
+                <td style="min-width:260px;">
+                  <form method="post" class="d-flex gap-2">
+        
+                    <input type="hidden" name="aktion" value="sperrzeit_setzen">
+                    <input type="hidden" name="etappe" value="{{ item.etappe }}">
+        
+                    <input
+                        type="datetime-local"
+                        class="form-control form-control-sm"
+                        name="sperrzeit"
+                        value="{% if item.sperrzeit %}{{ item.sperrzeit.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+        
+                </td>
+        
+                <td>
+                    <button class="btn btn-sm btn-primary">
+                        💾 Speichern
+                    </button>
+        
+                  </form>
+                </td>
+        
+              </tr>
               {% endfor %}
             </tbody>
+        
           </table>
         </div>
       </div>
