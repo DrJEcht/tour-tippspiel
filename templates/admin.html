@@ -110,6 +110,11 @@
                         class="form-control form-control-sm"
                         name="sperrzeit"
                         value="{% if item.sperrzeit %}{{ item.sperrzeit.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                    {% if item.sperrzeit %}
+                        <small class="text-muted">
+                            Gespeichert: {{ item.sperrzeit.strftime('%d.%m.%Y %H:%M') }}
+                        </small>
+                    {% endif %}
         
                 </td>
         
