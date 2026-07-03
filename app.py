@@ -185,8 +185,8 @@ def ist_etappe_gesperrt(etappe):
         return False
 
         if status.sperrzeit:
-        jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)
-        return jetzt >= status.sperrzeit
+            jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)
+            return jetzt >= status.sperrzeit
 
     return False
 
