@@ -474,9 +474,12 @@ def admin():
 
     etappen_status = []
     for etappe in load_etappen():
+        status = EtappenStatus.query.filter_by(etappe=etappe).first()
+    
         etappen_status.append({
             "etappe": etappe,
-            "gesperrt": ist_etappe_gesperrt(etappe)
+            "gesperrt": ist_etappe_gesperrt(etappe),
+            "sperrzeit": status.sperrzeit if status else None
         })
 
     return render_template(
