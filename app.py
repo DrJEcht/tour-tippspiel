@@ -2,7 +2,9 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from sqlalchemy import text
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "lokaler_test_schluessel")
@@ -77,6 +79,7 @@ class EtappenStatus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     etappe = db.Column(db.String(200), unique=True, nullable=False)
     gesperrt = db.Column(db.Boolean, default=False)
+    sperrzeit = db.Column(db.DateTime, nullable=True)
 
 class Benutzer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,12 +90,21 @@ class Benutzer(db.Model):
 
 with app.app_context():
     db.create_all()
+    
+with app.app_context():
+    try:
+        db.session.execute(text("ALTER TABLE etappen_status ADD COLUMN sperrzeit TIMESTAMP"))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 with app.app_context():
+    db.create_all()
+
     if not Benutzer.query.filter_by(name="Admin").first():
         admin = Benutzer(
             name="Admin",
-            passwort_hash=generate_password_hash("Ulle"),
+            passwort_hash=generate_password_hash(os.environ.get("ADMIN_PASSWORT", "Ulle")),
             ist_admin=True,
             aktiv=True
         )
@@ -168,8 +180,21 @@ def load_etappen():
 
 def ist_etappe_gesperrt(etappe):
     status = EtappenStatus.query.filter_by(etappe=etappe).first()
-    return status.gesperrt if status else False
 
+    if not status:
+        return False
+
+    if status.gesperrt:
+        return True
+
+    if status.sperrzeit:
+        jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)
+        return jetzt >= status.sperrzeit
+
+    return False
+
+def sind_tipps_sichtbar(etappe):
+    return ist_etappe_gesperrt(etappe)
 
 def setze_etappe_gesperrt(etappe, gesperrt):
     status = EtappenStatus.query.filter_by(etappe=etappe).first()
@@ -275,15 +300,19 @@ def index():
 
     tipps_etappe = []
 
-    for name, daten in rangliste:
-        for tipp in daten["tipps"]:
-            if tipp["etappe"] == ausgewaehlte_etappe:
-                tipps_etappe.append({
-                    "name": name,
-                    "daten": tipp["daten"],
-                    "korrekt": tipp["korrekt"],
-                    "punkte": tipp["punkte"]
-                })
+    if ausgewaehlte_etappe and sind_tipps_sichtbar(ausgewaehlte_etappe):
+        alle_tipps = Tipp.query.filter_by(etappe=ausgewaehlte_etappe).all()
+    
+        for gespeicherter_tipp in alle_tipps:
+            if gespeicherter_tipp.tipper == "Admin":
+                continue
+    
+            tipps_etappe.append({
+                "name": gespeicherter_tipp.tipper,
+                "daten": gespeicherter_tipp.daten,
+                "korrekt": {},
+                "punkte": "-"
+            })
 
     return render_template(
         "index.html",
@@ -424,6 +453,22 @@ def admin():
         elif aktion == "entsperren" and etappe:
             setze_etappe_gesperrt(etappe, False)
             flash(f"{etappe} wurde wieder geöffnet.", "success")
+
+        elif aktion == "sperrzeit_setzen" and etappe:
+            sperrzeit_text = request.form.get("sperrzeit", "").strip()
+        
+            status = EtappenStatus.query.filter_by(etappe=etappe).first()
+            if not status:
+                status = EtappenStatus(etappe=etappe)
+                db.session.add(status)
+        
+            if sperrzeit_text:
+                status.sperrzeit = datetime.fromisoformat(sperrzeit_text)
+            else:
+                status.sperrzeit = None
+        
+            db.session.commit()
+            flash(f"Sperrzeit für {etappe} wurde gespeichert.", "success")
 
         return redirect(url_for("admin"))
 
