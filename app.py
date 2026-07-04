@@ -285,7 +285,6 @@ def berechne_rangliste():
 
     return rangliste
 
-
 @app.route("/")
 def index():
     rangliste_dict = berechne_rangliste()
@@ -296,23 +295,22 @@ def index():
     )
 
     etappen = load_etappen()
-    ausgewaehlte_etappe = request.args.get("etappe") or (etappen[0] if etappen else None)
+    ausgewaehlte_etappe = request.args.get("etappe")
+
+    if not ausgewaehlte_etappe and etappen:
+        ausgewaehlte_etappe = etappen[0]
 
     tipps_etappe = []
 
-    if ausgewaehlte_etappe and sind_tipps_sichtbar(ausgewaehlte_etappe):
-        alle_tipps = Tipp.query.filter_by(etappe=ausgewaehlte_etappe).all()
-    
-        for gespeicherter_tipp in alle_tipps:
-            if gespeicherter_tipp.tipper == "Admin":
-                continue
-    
-            tipps_etappe.append({
-                "name": gespeicherter_tipp.tipper,
-                "daten": gespeicherter_tipp.daten,
-                "korrekt": {},
-                "punkte": "-"
-            })
+    for name, daten in rangliste:
+        for tipp in daten["tipps"]:
+            if str(tipp["etappe"]).strip() == str(ausgewaehlte_etappe).strip():
+                tipps_etappe.append({
+                    "name": name,
+                    "daten": tipp["daten"],
+                    "korrekt": tipp["korrekt"],
+                    "punkte": tipp["punkte"]
+                })
 
     return render_template(
         "index.html",
@@ -324,7 +322,6 @@ def index():
         kategorie_labels=KATEGORIE_LABELS,
         startseiten_info=StartseitenInfo.query.first()
     )
-
 
 @app.route("/tippen", methods=["GET", "POST"])
 def tippen():
