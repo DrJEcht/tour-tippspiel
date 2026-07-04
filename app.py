@@ -343,6 +343,10 @@ def tippen():
         tipp = request.form.to_dict()
         tipp["tipper"] = benutzer.name
 
+        if benutzer.ist_admin:
+            tipp["tipper"] = "Admin"
+            tipp["is_admin_result"] = "true"
+            
         if not benutzer.ist_admin and ist_etappe_gesperrt(tipp.get("etappe")):
             flash("Diese Tipprunde ist bereits gesperrt.", "error")
             return redirect(url_for("tippen"))
