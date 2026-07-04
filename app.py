@@ -235,7 +235,7 @@ def berechne_rangliste():
     referenzen = {}
 
     for tipp in tipps:
-        if tipp.get("tipper") == "Admin":
+        if tipp.get("tipper") == "Admin" or tipp.get("is_admin_result") == "true":
             referenzen[tipp.get("etappe")] = tipp
 
     for tipp in tipps:
