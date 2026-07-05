@@ -332,7 +332,7 @@ def index():
     return render_template(
         "index.html",
         rangliste=rangliste,
-        kategorien=BASIS_KATEGORIEN,
+        kategorien=anzeige_kategorien,
         etappen=etappen,
         ausgewaehlte_etappe=ausgewaehlte_etappe,
         tipps_etappe=tipps_etappe,
