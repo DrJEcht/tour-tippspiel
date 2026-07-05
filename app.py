@@ -312,13 +312,13 @@ def index():
                     "punkte": tipp["punkte"]
                 })
 
-    if ausgewaehlte_etappe and ausgewaehlte_etappe.strip().lower() == "gesamtsieger":
-        kategorien = [
-            "gesamtsieger_tour",
-            "gesamtsieger_gruen",
-            "gesamtsieger_gepunktet",
-            "gesamtsieger_weiss"
-        ]
+    if ausgewaehlte_etappe and "gesamt" in ausgewaehlte_etappe.lower():
+    kategorien = [
+        "gesamtsieger_tour",
+        "gesamtsieger_gruen",
+        "gesamtsieger_gepunktet",
+        "gesamtsieger_weiss"
+    ]
     else:
         kategorien = [
             "etappe_gewinner_fahrer",
