@@ -184,14 +184,12 @@ def ist_etappe_gesperrt(etappe):
     if not status:
         return False
 
-    if status.gesperrt:
-        return True
-
     if status.sperrzeit:
         jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)
         return jetzt >= status.sperrzeit
 
-    return False
+    return status.gesperrt
+
 
 def sind_tipps_sichtbar(etappe):
     return ist_etappe_gesperrt(etappe)
