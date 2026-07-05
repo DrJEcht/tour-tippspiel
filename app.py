@@ -313,12 +313,12 @@ def index():
                 })
 
     if ausgewaehlte_etappe and "gesamt" in ausgewaehlte_etappe.lower():
-    kategorien = [
-        "gesamtsieger_tour",
-        "gesamtsieger_gruen",
-        "gesamtsieger_gepunktet",
-        "gesamtsieger_weiss"
-    ]
+        kategorien = [
+            "gesamtsieger_tour",
+            "gesamtsieger_gruen",
+            "gesamtsieger_gepunktet",
+            "gesamtsieger_weiss"
+        ]
     else:
         kategorien = [
             "etappe_gewinner_fahrer",
@@ -332,7 +332,7 @@ def index():
     return render_template(
         "index.html",
         rangliste=rangliste,
-        kategorien=kategorien,,
+        kategorien=kategorien,
         etappen=etappen,
         ausgewaehlte_etappe=ausgewaehlte_etappe,
         tipps_etappe=tipps_etappe,
