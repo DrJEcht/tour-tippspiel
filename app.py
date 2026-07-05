@@ -312,6 +312,23 @@ def index():
                     "punkte": tipp["punkte"]
                 })
 
+    if ausgewaehlte_etappe and ausgewaehlte_etappe.strip().lower() == "gesamtsieger":
+        kategorien = [
+            "gesamtsieger_tour",
+            "gesamtsieger_gruen",
+            "gesamtsieger_gepunktet",
+            "gesamtsieger_weiss"
+        ]
+    else:
+        kategorien = [
+            "etappe_gewinner_fahrer",
+            "etappe_gewinner_team",
+            "gelbes_trikot",
+            "gruenes_trikot",
+            "gepunktetes_trikot",
+            "weisses_trikot"
+        ]
+
     return render_template(
         "index.html",
         rangliste=rangliste,
